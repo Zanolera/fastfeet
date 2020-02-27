@@ -5,7 +5,7 @@ export default async (req, res, next) => {
 
     if (!checkIsAdmin) {
         return res.status(401).json({
-            error: 'Acess Unauthorized.',
+            error: 'Unauthorized Access.',
         });
     }
     return next();
