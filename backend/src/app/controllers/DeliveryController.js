@@ -3,6 +3,9 @@ import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
+import DeliveryConfirmationMail from '../jobs/DeliveryConfirmationMail';
+import Queue from '../../lib/Queue';
+import Notification from '../schemas/Notification';
 
 class DeliveryController {
     async index(req, res) {
@@ -76,11 +79,9 @@ class DeliveryController {
         /**
          * Check if recipient_id is a recipient
          */
-        const checkIsRecipient = await Recipient.findOne({
-            where: { id: recipient_id },
-        });
+        const recipient = await Recipient.findByPk(recipient_id);
 
-        if (!checkIsRecipient) {
+        if (!recipient) {
             return res.status(401).json({
                 error:
                     'You can only create a delivery to an existing recipient.',
@@ -90,25 +91,38 @@ class DeliveryController {
         /**
          * Check if deliveryman_id is a deliveryman
          */
-        const checkIsDeliveryman = await Deliveryman.findOne({
-            where: { id: deliveryman_id },
-        });
+        const deliveryman = await Deliveryman.findByPk(deliveryman_id);
 
-        if (!checkIsDeliveryman) {
+        if (!deliveryman) {
             return res.status(401).json({
                 error:
                     'You can only create a delivery to an existing deliveryman.',
             });
         }
 
-        const { id, product } = await Delivery.create(req.body);
+        const delivery = await Delivery.create(req.body);
 
-        // enviar email para o entregador aqui
+        /**
+         * Send notification to deliveryman
+         */
+        await Notification.create({
+            content: `The product ${req.body.product} to ${recipient.name} is available to withdrawal.`,
+            deliveryman: deliveryman.id,
+        });
 
-        return res.json({ id, product });
+        /**
+         * Send delivery confirmation mail
+         */
+        await Queue.add(DeliveryConfirmationMail.key, {
+            delivery,
+            recipient,
+            deliveryman,
+        });
+
+        return res.json(delivery);
     }
 
-    async put(req, res) {
+    async update(req, res) {
         const schema = Yup.object().shape({
             recipient_id: Yup.number().required(),
             deliveryman_id: Yup.number().required(),
@@ -157,9 +171,8 @@ class DeliveryController {
                         'You can only update a delivery to an existing deliveryman.',
                 });
             }
-
-            // enviar email para os dois entregadores avisando um que foi cancelada e o outro que foi criada uma encomenda
         }
+
         const { id, product } = await delivery.update(req.body);
 
         return res.json({
@@ -171,32 +184,15 @@ class DeliveryController {
     }
 
     async delete(req, res) {
-        const delivery = await Delivery.findByPk(req.params.id, {
-            attributes: ['id', 'product', 'canceled_at'],
-            include: [
-                {
-                    model: Recipient,
-                    as: 'recipient',
-                    attributes: ['name'],
-                },
-                {
-                    model: Deliveryman,
-                    as: 'deliveryman',
-                    attributes: ['name', 'email'],
-                },
-            ],
-        });
+        const delivery = await Delivery.findByPk(req.params.id);
 
-        if (!delivery || delivery.canceled_at !== null) {
+        if (!delivery) {
             return res.status(400).json({ error: 'Delivery not found.' });
         }
 
-        delivery.canceled_at = new Date();
-        await delivery.save();
+        await delivery.destroy();
 
-        // enviar email de cancelamento para o entregador aqui
-
-        return res.json(delivery);
+        return res.json();
     }
 }
 
