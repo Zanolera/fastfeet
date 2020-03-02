@@ -78,7 +78,9 @@ class DeliverymanController {
 
         const { email, avatar_id } = req.body;
 
-        const deliveryman = await Deliveryman.findByPk(req.params.id);
+        const deliveryman = await Deliveryman.findByPk(
+            req.params.deliverymanId
+        );
 
         if (!deliveryman) {
             return res
@@ -122,9 +124,9 @@ class DeliverymanController {
     }
 
     async delete(req, res) {
-        const { id } = req.params;
+        const { deliverymanId } = req.params;
 
-        const deliveryman = await Deliveryman.findByPk(id);
+        const deliveryman = await Deliveryman.findByPk(deliverymanId);
 
         if (!deliveryman) {
             return res

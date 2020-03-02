@@ -11,6 +11,8 @@ import NotificationController from './app/controllers/NotificationController';
 import AvailableDeliveryController from './app/controllers/AvailableDeliveryController';
 import CompleteDeliveryController from './app/controllers/CompleteDeliveryController';
 import WithdrawalDeliveryController from './app/controllers/WithdrawalDeliveryController';
+import UndeliverableDeliveryController from './app/controllers/UndeliverableDeliveryController';
+import DeliveryProblemController from './app/controllers/DeliveryProblemController';
 
 import authMiddleware from './app/middlewares/auth';
 import adminMiddleware from './app/middlewares/admin';
@@ -30,14 +32,22 @@ routes.put('/users', UserController.update);
 // Recipients
 routes.get('/recipients', adminMiddleware, RecipientController.index);
 routes.post('/recipients', adminMiddleware, RecipientController.store);
-routes.put('/recipients/:id', adminMiddleware, RecipientController.update);
+routes.put(
+    '/recipients/:recipientId',
+    adminMiddleware,
+    RecipientController.update
+);
 
 // Deliveryman
 routes.get('/deliverymans', adminMiddleware, DeliverymanController.index);
 routes.post('/deliverymans', adminMiddleware, DeliverymanController.store);
-routes.put('/deliverymans/:id', adminMiddleware, DeliverymanController.update);
+routes.put(
+    '/deliverymans/:deliverymanId',
+    adminMiddleware,
+    DeliverymanController.update
+);
 routes.delete(
-    '/deliverymans/:id',
+    '/deliverymans/:deliverymanId',
     adminMiddleware,
     DeliverymanController.delete
 );
@@ -63,10 +73,21 @@ routes.put(
     '/deliveries/withdrawal/:deliveryId',
     WithdrawalDeliveryController.update
 );
-
 routes.put(
     '/deliveries/complete/:deliveryId',
     CompleteDeliveryController.update
+);
+
+// Delivery problems
+routes.get('/deliveries/problems', UndeliverableDeliveryController.index);
+routes.get('/deliveries/:deliveryId/problems', DeliveryProblemController.index);
+routes.post(
+    '/deliveries/:deliveryId/problems',
+    DeliveryProblemController.store
+);
+routes.delete(
+    '/problems/:problemId/cancel-delivery',
+    DeliveryProblemController.delete
 );
 
 // Notification
