@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { Op } from 'sequelize';
 import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
 import Deliveryman from '../models/Deliveryman';
@@ -9,12 +10,14 @@ import Notification from '../schemas/Notification';
 
 class DeliveryController {
     async index(req, res) {
-        const { page = 1 } = req.query;
+        const { page = 1, product = '%' } = req.query;
 
         const deliverys = await Delivery.findAll({
             where: {
                 canceled_at: null,
-                // deliveryman_id: req.userId,
+                product: {
+                    [Op.like]: product,
+                },
             },
             attributes: [
                 'id',
