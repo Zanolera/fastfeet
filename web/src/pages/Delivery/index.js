@@ -1,5 +1,5 @@
 import React from 'react';
 
-export default function SignIn() {
+export default function Delivery() {
   return <h1>Entregas</h1>;
 }
