@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { darken } from 'polished';
+import { Link } from 'react-router-dom';
 
 export const Container = styled.div`
   background: #fff;
@@ -7,8 +9,7 @@ export const Container = styled.div`
 
 export const Content = styled.div`
   height: 64px;
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 1920px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -19,15 +20,23 @@ export const Content = styled.div`
       margin-right: 20px;
       padding-right: 20px;
       border-right: 1px solid #eee;
-    }
-    a {
-      font-weight: bold;
-      color: #7159c1;
+      max-height: 32px;
     }
   }
   aside {
     display: flex;
     align-items: center;
+  }
+`;
+
+export const StyledLink = styled(Link)`
+  color: ${(props) => (props.to.selected ? darken(0.4, '#999999') : '#999999')};
+  font-size: 16px;
+  padding-right: 10px;
+  font-weight: bold;
+  transition: color 0.2s;
+  &:hover {
+    color: ${darken(0.1, '#999999')};
   }
 `;
 
@@ -43,16 +52,20 @@ export const Profile = styled.div`
       display: block;
       color: #333;
     }
-    a {
-      display: block;
-      margin-top: 2px;
-      font-size: 12px;
-      color: #999;
+    button {
+      width: 100%;
+      margin: 10px 0 0;
+      background: #fff;
+      font-weight: bold;
+      color: #f64c75;
+      border: 0;
+      border-radius: 4px;
+      font-size: 16px;
+      transition: background 0.2s;
+
+      &:hover {
+        color: ${darken(0.08, '#f64c75')};
+      }
     }
-  }
-  img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
   }
 `;
