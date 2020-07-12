@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import logo from '~/assets/fastfeet-logo.png';
 
@@ -19,11 +20,13 @@ export default function Header() {
     <Container>
       <Content>
         <nav>
-          <img src={logo} alt="Fastfeet" />
+          <Link to="/">
+            <img src={logo} alt="Fastfeet" />
+          </Link>
           <StyledLink to="/deliveries">ENCOMENDAS</StyledLink>
-          <StyledLink to="/deliveries">ENTREGADORES</StyledLink>
-          <StyledLink to="/deliveries">DESTINATÁRIOS</StyledLink>
-          <StyledLink to="/deliveries">PROBLEMAS</StyledLink>
+          <StyledLink to="/deliverymen">ENTREGADORES</StyledLink>
+          <StyledLink to="/recipients">DESTINATÁRIOS</StyledLink>
+          <StyledLink to="/problems">PROBLEMAS</StyledLink>
         </nav>
 
         <aside>
