@@ -1,9 +1,11 @@
 import * as Yup from 'yup';
 import { Op } from 'sequelize';
+
 import Delivery from '../models/Delivery';
 import Recipient from '../models/Recipient';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
+
 import DeliveryConfirmationMail from '../jobs/DeliveryConfirmationMail';
 import Queue from '../../lib/Queue';
 import Notification from '../schemas/Notification';
@@ -12,7 +14,7 @@ class DeliveryController {
     async index(req, res) {
         const { page = 1, product = '%' } = req.query;
 
-        const deliverys = await Delivery.findAll({
+        const { count, rows: deliveries } = await Delivery.findAndCountAll({
             where: {
                 canceled_at: null,
                 product: {
@@ -25,10 +27,11 @@ class DeliveryController {
                 'canceled_at',
                 'start_date',
                 'end_date',
+                'status',
             ],
-            order: ['product'],
-            limit: 20,
-            offset: (page - 1) * 20, // How many records will skip
+            order: ['id'],
+            limit: 7,
+            offset: (page - 1) * 7, // How many records will skip
             include: [
                 {
                     model: Recipient,
@@ -63,7 +66,7 @@ class DeliveryController {
             ],
         });
 
-        return res.json(deliverys);
+        return res.json({deliveries, count});
     }
 
     async store(req, res) {
